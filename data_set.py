@@ -10,7 +10,7 @@ DIC_LABEL_TO_VALUE = {'en' : 0, 'de' : 1, 'es' : 2}
 
 class SpokenLanguageIdentification(Dataset):
     
-    def __init__(self, data_dir, train=True, transform=None):
+    def __init__(self, data_dir=DATA_DIR, train=True, transform=None):
         
         if train is True :
           self.data_dir = f'{data_dir}/train/train'
