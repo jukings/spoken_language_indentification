@@ -46,7 +46,7 @@ def test(model, dataloader):
 
 if __name__=='__main__':
 
-    print(f'Using device : {device}')
+    print(f'Using device {device}')
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--exp_name', type=str, default = 'MFCCS_net', help='experiment name')
@@ -67,12 +67,12 @@ if __name__=='__main__':
     trainset = SpokenLanguageIdentification('./data', train=True, transform=transform)
     testset = SpokenLanguageIdentification('./data', train=False, transform=transform)
 
-    trainloader = DataLoader(trainset, batch_size=4, shuffle=True, num_workers=0)
-    testloader = DataLoader(testset, batch_size=4, shuffle=True, num_workers=0)
+    trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=0)
+    testloader = DataLoader(testset, batch_size=batch_size, shuffle=True, num_workers=0)
 
     net = MFCCS_net()
     net = net.to(device)
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+    optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
 
     train(net, optimizer, trainloader, writer, epochs)
     test_acc = test(net,testloader)
