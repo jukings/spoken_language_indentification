@@ -32,7 +32,6 @@ def train(net, optimizer, loader, writer, epochs=10):
             t.set_description(f'training loss: {np.mean(running_loss)}')
         writer.add_scalar('training loss', np.mean(running_loss), epoch)
 
-'''
 def test(model, dataloader):
     test_corrects = 0
     total = 0
@@ -41,12 +40,13 @@ def test(model, dataloader):
             inputs = data['audio'].to(device)
             labels = data['label'].to(device)
             prediction = model(inputs).argmax(1)
-            test_corrects += prediction.eq(label.argmax(1)).sum().item()
-            total += y.size(0)
+            test_corrects += prediction.eq(labels.argmax(1)).sum().item()
+            total += labels.size(0)
     return test_corrects / total
-'''
 
 if __name__=='__main__':
+
+    print(f'Using device : {device}')
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--exp_name', type=str, default = 'MFCCS_net', help='experiment name')
@@ -65,16 +65,18 @@ if __name__=='__main__':
     transform = transforms.Compose([Resize_Audio(),Build_MFCCS(),To_Tensor()])
     
     trainset = SpokenLanguageIdentification('./data', train=True, transform=transform)
-    #testset = SpokenLanguageIdentification('./data', train=False, transform=transform)
+    testset = SpokenLanguageIdentification('./data', train=False, transform=transform)
 
     trainloader = DataLoader(trainset, batch_size=4, shuffle=True, num_workers=0)
-    #testloader = DataLoader(testset, batch_size=4, shuffle=True, num_workers=0)
+    testloader = DataLoader(testset, batch_size=4, shuffle=True, num_workers=0)
 
     net = MFCCS_net()
     net = net.to(device)
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
     train(net, optimizer, trainloader, writer, epochs)
+    test_acc = test(net,testloader)
+    print(f'Test accuracy:{test_acc}')
     
     image_example = torch.zeros(1,1,13,431)
     writer.add_graph(net, image_example)
