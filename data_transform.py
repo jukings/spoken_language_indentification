@@ -39,5 +39,6 @@ class To_Tensor(object):
     def __call__(self, sample):
         audio, label = sample['audio'], sample['label']
         audio = torch.unsqueeze(torch.from_numpy(audio),0)
-        label = torch.from_numpy(label)
+        if label is not None :
+          label = torch.from_numpy(label)
         return {'audio': audio,'label': label}
