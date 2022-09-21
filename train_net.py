@@ -7,7 +7,7 @@ from network import MFCCS_net
 import torchvision.transforms as transforms
 import torch.nn as nn
 from tqdm import tqdm
-from data_transform import Resize_Audio, Build_MFCCS, To_Tensor
+from data_transform import Resize_Audio, Build_MFCCS, To_Tensor, Normalize_Audio
 from data_set import SpokenLanguageIdentification
 from torch.utils.data import DataLoader
 
@@ -62,7 +62,7 @@ if __name__=='__main__':
 
     writer = SummaryWriter(f'runs/{args.exp_name}')
 
-    transform = transforms.Compose([Resize_Audio(),Build_MFCCS(),To_Tensor()])
+    transform = transforms.Compose([Resize_Audio(),Build_MFCCS(),Normalize_Audio(),To_Tensor()])
     
     trainset = SpokenLanguageIdentification('./data', train=True, transform=transform)
     testset = SpokenLanguageIdentification('./data', train=False, transform=transform)

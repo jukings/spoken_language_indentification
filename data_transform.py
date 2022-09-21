@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import librosa
 from torchvision import transforms as transforms
+from sklearn.preprocessing import StandardScaler
 
 class Resize_Audio(object) :
 
@@ -34,11 +35,19 @@ class Build_MFCCS(object) :
     #return {'mfccs' : mfccs, 'delta_mfccs' : delta_mfccs, 'ddelta_mfccs' : ddelta_mfccs}
     return {'audio' : mfccs, 'label' : sample['label']}
 
+class Normalize_Audio(object) :
+      
+    def __call__(self,sample) :
+      signal = sample['audio']
+      sc = StandardScaler()
+      signal = sc.fit_transform(signal)
+      return {'audio' : signal, 'label' : sample['label']}
+
 class To_Tensor(object):
 
     def __call__(self, sample):
-        audio, label = sample['audio'], sample['label']
-        audio = torch.unsqueeze(torch.from_numpy(audio),0)
+        signal, label = sample['audio'], sample['label']
+        signal = torch.unsqueeze(torch.from_numpy(signal),0)
         if label is not None :
           label = torch.from_numpy(label)
-        return {'audio': audio,'label': label}
+        return {'audio': signal,'label': label}
