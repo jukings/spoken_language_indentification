@@ -16,13 +16,16 @@ class MFCCS_net(nn.Module):
 
         super().__init__()
        
+        self.output_dim = output_dim
+        self.input_dim = input_dim
+
         self.conv1 = nn.Conv2d(in_channels=1,out_channels=32,kernel_size=7) 
         self.conv2 = nn.Conv2d(in_channels=32,out_channels=64,kernel_size=5, padding='same')
         self.conv3 = nn.Conv2d(in_channels=64,out_channels=128,kernel_size=3, padding='same')
         self.conv4 = nn.Conv2d(in_channels=128,out_channels=256,kernel_size=3, padding='same')
         self.conv5 = nn.Conv2d(in_channels=256,out_channels=512,kernel_size=3, padding='same')
         self.fc1 = Linear(512*1*14,256)
-        self.fc2 = Linear(256,output_dim)
+        self.fc2 = Linear(256,self.output_dim)
 
     def forward(self, x, mode=1):
 
@@ -33,6 +36,6 @@ class MFCCS_net(nn.Module):
         x = F.relu(F.max_pool2d(self.conv5(x),kernel_size=3, stride=2, padding=1))
         x = flatten(x,mode)
         x = F.relu(self.fc1(x))
-        x= F.relu(self.fc2(x))
+        x = F.softmax(self.fc2(x), dim=1)
         
         return x
