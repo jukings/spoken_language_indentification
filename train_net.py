@@ -76,7 +76,8 @@ if __name__=='__main__':
 
     train(net, optimizer, trainloader, writer, epochs)
     test_acc = test(net,testloader)
-    print(f'Test accuracy:{test_acc}')
+    print(f'Test accuracy : {test_acc}')
+    torch.save(net.state_dict(), "mfccs_net.pth")
     
     image_example = torch.zeros(1,1,13,431)
     writer.add_graph(net, image_example)
