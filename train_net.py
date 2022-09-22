@@ -7,7 +7,7 @@ from network import MFCCS_net
 import torchvision.transforms as transforms
 import torch.nn as nn
 from tqdm import tqdm
-from data_transform import Resize_Audio, Build_MFCCS, To_Tensor, Normalize_Audio
+from data_transform import Resize_Audio, Build_MFCCS_librosa, Build_MFCCS_kaggle, To_Tensor, Normalize_Audio
 from data_set import SpokenLanguageIdentification
 from torch.utils.data import DataLoader
 
@@ -58,6 +58,7 @@ if __name__=='__main__':
     parser.add_argument('--epochs', type=int, default = 10, help='epochs')
     parser.add_argument('--lr', type=float, default = 10**-3, help='learning rate')
     parser.add_argument('--train_sample', type=float, default = 10**6, help='number of maximum sample for training')
+    parser.add_argument('--optimizer', type=str, default = 'SGD', help='optimizer to use for learning')
 
     args = parser.parse_args()
     exp_name = args.exp_name
@@ -65,10 +66,11 @@ if __name__=='__main__':
     batch_size = args.batch_size
     lr = args.lr
     train_sample = args.train_sample
+    optimizer = args.optimizer
 
     writer = SummaryWriter(f'runs/{args.exp_name}')
 
-    transform = transforms.Compose([Resize_Audio(),Build_MFCCS(),To_Tensor()])
+    transform = transforms.Compose([Resize_Audio(),Build_MFCCS_kaggle(),To_Tensor()])
     
     trainset = SpokenLanguageIdentification('./data', train=True, transform=transform)
     testset = SpokenLanguageIdentification('./data', train=False, transform=transform)
@@ -78,7 +80,13 @@ if __name__=='__main__':
 
     net = MFCCS_net()
     net = net.to(device)
-    optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+
+    if optimizer == 'SGD' :
+        optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+    elif optimizer == 'Adam' :
+        optimizer = optim.Adam(net.parameters(),lr=lr)
+    else :
+        raise TypeError("Not valid optimizer")
 
     train(net, optimizer, trainloader, writer, epochs, train_sample)
     test_acc = test(net,testloader)
