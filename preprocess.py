@@ -2,6 +2,7 @@ import torch
 import os
 import librosa
 import numpy as np
+import argparse
 
 DATA_DIR = './data'
 
@@ -22,8 +23,11 @@ def build_mfccs(data_dir = DATA_DIR, train=True) :
 
 if __name__=='__main__' :
 
-    parser.add_argument('--data_dir', , type=str, default = './data', help='directory where to find the data')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_dir', type=str, default = './data', help='directory where to find the data')
+    args = parser.parse_args()
     data_dir = args.data_dir
+    
 
     build_mfccs(data_dir,train=True)
     build_mfccs(data_dir, train=False)
