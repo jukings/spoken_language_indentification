@@ -15,15 +15,12 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def train(net, optimizer, loader, writer, epochs, train_sample):
     criterion = nn.CrossEntropyLoss()
+
     for epoch in range(epochs):
         running_loss = []
         t = tqdm(loader)
-        tmp_count = 0
-        
+
         for data in t:
-            if tmp_count > train_sample :
-                break
-            tmp_count+=1
             inputs = data['audio'].to(device)
             labels = data['label'].to(device)
             outputs = net(inputs)
@@ -32,7 +29,8 @@ def train(net, optimizer, loader, writer, epochs, train_sample):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            t.set_description(f'training loss: {np.mean(running_loss)}')
+            t.set_description(f'Epochs {epoch+1}/{epochs} -- training loss: {np.mean(running_loss)}')
+
         writer.add_scalar('training loss', np.mean(running_loss), epoch)
 
 def test(model, dataloader):
