@@ -14,12 +14,26 @@ from torch.optim.lr_scheduler import StepLR
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def train(net, optimizer, loader, writer, epochs, scheduler=None):
+def loader_loss(net, dataloader) :
+    test_corrects = 0
+    total = 0
+    running_loss = []
+    criterion = nn.CrossEntropyLoss()
+    with torch.no_grad():
+        for data in dataloader:
+            inputs = data['audio'].to(device)
+            labels = data['label'].to(device)
+            outputs = net(inputs)
+            loss = criterion(outputs, labels)
+            running_loss.append(loss.item())
+    return running_loss
+
+def train(net, optimizer, trainloader, testloader, writer, epochs, scheduler=None):
     criterion = nn.CrossEntropyLoss()
 
     for epoch in range(epochs):
         running_loss = []
-        t = tqdm(loader)
+        t = tqdm(trainloader)
 
         for data in t:
             inputs = data['audio'].to(device)
@@ -30,14 +44,21 @@ def train(net, optimizer, loader, writer, epochs, scheduler=None):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            t.set_description(f'Epochs {epoch+1}/{epochs} -- training loss: {np.mean(running_loss)}')
+            test_loss = np.mean(loader_loss(net,testloader))
+            train_loss = np.mean(running_loss)
+
+            t.set_description(f'Epochs {epoch+1}/{epochs} -- training loss : {train_loss} -- test loss : {test_loss}')
         
         if scheduler is not None :
             scheduler.step()
 
-        writer.add_scalar('training loss', np.mean(running_loss), epoch)
+        writer.add_scalars('loss', {'train' : np.mean(running_loss), 'test' : test_loss}, epoch)
+        
+        test_acc = loader_accuracy(net, testloader)
+        train_acc = loader_accuracy(net, trainloader)
+        writer.add_scalars('accuracy loss', {'train' : train_acc, 'test' : test_acc}, epoch)
 
-def test(model, dataloader):
+def loader_accuracy(model, dataloader):
     test_corrects = 0
     total = 0
     with torch.no_grad():
@@ -92,12 +113,12 @@ if __name__=='__main__':
 
     scheduler = StepLR(optimizer, step_size= 1, gamma=0.9)
 
-    train(net, optimizer, trainloader, writer, epochs, scheduler)
-    test_acc = test(net,testloader)
+    train(net, optimizer, trainloader, testloader, writer, epochs)
+    test_acc = loader_accuracy(net,testloader)
     print(f'Test accuracy : {test_acc}')
     torch.save(net.state_dict(), "mfccs_net.pth")
     
-    image_example = torch.zeros(1,1,13,431)
+    image_example = torch.zeros(1,1,10,431)
     writer.add_graph(net, image_example)
 
     
