@@ -54,11 +54,12 @@ def train(net, optimizer, trainloader, testloader, writer, epochs, scheduler=Non
         if scheduler is not None :
             scheduler.step()
 
-        writer.add_scalars('loss', {'train' : np.mean(running_loss), 'test' : test_loss}, epoch)
+        writer.add_scalar(' training loss', np.mean(running_loss), epoch)
+        #writer.add_scalars('loss', {'train' : np.mean(running_loss), 'test' : test_loss}, epoch)
         
-        test_acc = loader_accuracy(net, testloader)
-        train_acc = loader_accuracy(net, trainloader)
-        writer.add_scalars('accuracy loss', {'train' : train_acc, 'test' : test_acc}, epoch)
+        #test_acc = loader_accuracy(net, testloader)
+        #train_acc = loader_accuracy(net, trainloader)
+        #writer.add_scalars('accuracy loss', {'train' : train_acc, 'test' : test_acc}, epoch)
 
 def loader_accuracy(model, dataloader):
     test_corrects = 0
@@ -120,7 +121,7 @@ if __name__=='__main__':
     print(f'Test accuracy : {test_acc}')
     torch.save(net.state_dict(), "mfccs_net.pth")
     
-    audio_example = os.listdir(f'{data_dir}/train/train')[0]
+    #audio_example = os.listdir(f'{data_dir}/train/train')[0]
     
     mfccs_example = os.listdir(f'{data_dir}/train/train_mfccs')[0]
     mfccs_example = np.load(f'{data_dir}/train/train_mfccs/{mfccs_example}')
