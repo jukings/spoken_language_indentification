@@ -58,6 +58,7 @@ if __name__=='__main__':
     parser.add_argument('--lr', type=float, default = 10**-3, help='learning rate')
     parser.add_argument('--train_sample', type=float, default = 10**6, help='number of maximum sample for training')
     parser.add_argument('--optimizer', type=str, default = 'SGD', help='optimizer to use for learning')
+    parser.add_argument('--data_dir', , type=str, default = './data', help='directory where to find the data')
 
     args = parser.parse_args()
     exp_name = args.exp_name
@@ -66,14 +67,15 @@ if __name__=='__main__':
     lr = args.lr
     train_sample = args.train_sample
     optimizer = args.optimizer
+    data_dir = args.data_dir
 
     writer = SummaryWriter(f'runs/{args.exp_name}')
 
     
     transform = transforms.Compose([To_Tensor()])
     
-    trainset = Data_FromMFCCSFile('./data', train=True, transform=transform)
-    testset = Data_FromMFCCSFile('./data', train=False, transform=transform)
+    trainset = Data_FromMFCCSFile(data_dir, train=True, transform=transform)
+    testset = Data_FromMFCCSFile(data_dir, train=False, transform=transform)
 
     trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=0)
     testloader = DataLoader(testset, batch_size=batch_size, shuffle=True, num_workers=0)
