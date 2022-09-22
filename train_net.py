@@ -46,15 +46,13 @@ def train(net, optimizer, trainloader, testloader, writer, epochs, scheduler=Non
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            test_loss = np.mean(loader_loss(net,testloader))
-            train_loss = np.mean(running_loss)
-
-            t.set_description(f'Epochs {epoch+1}/{epochs} -- training loss : {train_loss} -- test loss : {test_loss}')
+            t.set_description(f'Epochs {epoch+1}/{epochs} -- training loss : {np.mean(running_loss)}')
         
         if scheduler is not None :
             scheduler.step()
 
         writer.add_scalar(' training loss', np.mean(running_loss), epoch)
+        #test_loss = np.mean(loader_loss(net,testloader))
         #writer.add_scalars('loss', {'train' : np.mean(running_loss), 'test' : test_loss}, epoch)
         
         #test_acc = loader_accuracy(net, testloader)
