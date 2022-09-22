@@ -10,22 +10,22 @@ NEW_DATA_DIR = './data'
 def build_mfccs(data_dir = DATA_DIR, new_data_dir = NEW_DATA_DIR, train=True) :
 
     if train :
-        t = tqdm(os.listdir(f'{DATA_DIR}/train/train/'))
+        t = tqdm(os.listdir(f'{data_dir}/train/train/'))
         t.set_description('Building MFCCS from train set')
         for file in t :
-            signal, sr = librosa.load(f'{DATA_DIR}/train/train/{file}')
+            signal, sr = librosa.load(f'{data_dir}/train/train/{file}')
             mfccs = librosa.feature.mfcc(y=signal, n_mfcc=10,sr=sr)
             new_file = file[:-4]
-            np.save(f'{NEW_DATA_DIR}/train/train_mfccs/{new_file}mfccs',mfccs)
+            np.save(f'{new_data_dir}/train/train_mfccs/{new_file}mfccs',mfccs)
 
     if not train :
-        t = tqdm(os.listdir(f'{DATA_DIR}/test/test/'))
+        t = tqdm(os.listdir(f'{data_dir}/test/test/'))
         t.set_description('Building MFCCS from test set')
         for file in t :
-            signal, sr = librosa.load(f'{DATA_DIR}/test/test/{file}')
+            signal, sr = librosa.load(f'{data_dir}/test/test/{file}')
             mfccs = librosa.feature.mfcc(y=signal, n_mfcc=10,sr=sr)
             new_file = file[:-4]
-            np.save(f'{NEW_DATA_DIR}/test/test_mfccs/{new_file}mfccs',mfccs)
+            np.save(f'{new_data_dir}/test/test_mfccs/{new_file}mfccs',mfccs)
 
 if __name__=='__main__' :
 
