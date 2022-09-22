@@ -5,12 +5,14 @@ import torch
 import argparse
 from network import MFCCS_net
 import torchvision.transforms as transforms
+from torchvision.utils import make_grid
 import torch.nn as nn
 from tqdm import tqdm
 from data_transform import Resize_Audio, Build_MFCCS_librosa, Build_MFCCS_kaggle, To_Tensor, Normalize_Signal
 from data_set import Data_FromAudioFile, Data_FromMFCCSFile
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import StepLR
+import os
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -118,8 +120,14 @@ if __name__=='__main__':
     print(f'Test accuracy : {test_acc}')
     torch.save(net.state_dict(), "mfccs_net.pth")
     
-    image_example = torch.zeros(1,1,10,431)
-    writer.add_graph(net, image_example)
+    audio_example = os.listdir(f'{data_dir}/train/train')[0]
+    
+    mfccs_example = os.listdir(f'{data_dir}/train/train_mfccs')[0]
+    mfccs_example = np.load(f'{data_dir}/train/train_mfccs/{mfccs_example}')
+    mfccs_example = torch.from_numpy(mfccs_example).unsqueeze(0).unsqueeze(0).to(device)
+
+    writer.add_graph(net, mfccs_example)
+
 
     
     
