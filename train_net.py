@@ -58,7 +58,7 @@ if __name__=='__main__':
     parser.add_argument('--lr', type=float, default = 10**-3, help='learning rate')
     parser.add_argument('--train_sample', type=float, default = 10**6, help='number of maximum sample for training')
     parser.add_argument('--optimizer', type=str, default = 'SGD', help='optimizer to use for learning')
-    parser.add_argument('--data_dir', , type=str, default = './data', help='directory where to find the data')
+    parser.add_argument('--data_dir', type=str, default = './data', help='directory where to find the data')
 
     args = parser.parse_args()
     exp_name = args.exp_name
