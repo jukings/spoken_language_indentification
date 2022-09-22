@@ -3,7 +3,7 @@ import librosa
 import numpy as np
 import sys
 from network import MFCCS_net 
-from data_transform import Resize_Audio, Build_MFCCS_librosa, To_Tensor, Normalize_Audio
+from data_transform import Resize_Audio, Build_MFCCS_librosa, To_Tensor, Normalize_Signal
 import torchvision.transforms as transforms
 import torch
 from torch.utils.data import DataLoader
