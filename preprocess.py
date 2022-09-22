@@ -5,7 +5,7 @@ import numpy as np
 
 DATA_DIR = './data'
 
-def build_mfccs(DATA_DIR = './data', train=True) :
+def build_mfccs(data_dir = DATA_DIR, train=True) :
 
     if train :
         for file in os.listdir(f'{DATA_DIR}/train/train_audio/') :
@@ -21,5 +21,9 @@ def build_mfccs(DATA_DIR = './data', train=True) :
             np.save(f'{DATA_DIR}/test/test_mfccs/{new_file}mfccs',mfccs)
 
 if __name__=='__main__' :
-    build_mfccs(train=True)
-    build_mfccs(train=False)
+
+    parser.add_argument('--data_dir', , type=str, default = './data', help='directory where to find the data')
+    data_dir = args.data_dir
+
+    build_mfccs(data_dir,train=True)
+    build_mfccs(data_dir, train=False)
