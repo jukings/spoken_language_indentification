@@ -150,7 +150,7 @@ class Build_MFCCS_librosa(object) :
     #delta_mfccs = librosa.feature.delta(mfccs)
     #ddelta_mfccs = librosa.feature.delta(mfccs, order=2)
     #return {'mfccs' : mfccs, 'delta_mfccs' : delta_mfccs, 'ddelta_mfccs' : ddelta_mfccs}
-    return {'audio' : (mfccs,sr), 'label' : sample['label']}
+    return {'audio' : mfccs, 'label' : sample['label']}
 
 class Build_MFCCS_kaggle(object) :
     
