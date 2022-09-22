@@ -70,7 +70,7 @@ if __name__=='__main__':
 
     writer = SummaryWriter(f'runs/{args.exp_name}')
 
-    transform = transforms.Compose([Resize_Audio(),Build_MFCCS_kaggle(),To_Tensor()])
+    transform = transforms.Compose([Resize_Audio(),Build_MFCCS_librosa(),To_Tensor()])
     
     trainset = SpokenLanguageIdentification('./data', train=True, transform=transform)
     testset = SpokenLanguageIdentification('./data', train=False, transform=transform)

@@ -149,6 +149,7 @@ class Build_MFCCS_kaggle(object) :
   def __call__(self, sample) :
     signal, sr = sample['audio']
     mfccs = generate_fb_and_mfcc(signal,sr)
+    mfccs = np.array(mfccs)
     #delta_mfccs = librosa.feature.delta(mfccs)
     #ddelta_mfccs = librosa.feature.delta(mfccs, order=2)
     #return {'mfccs' : mfccs, 'delta_mfccs' : delta_mfccs, 'ddelta_mfccs' : ddelta_mfccs}
