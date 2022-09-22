@@ -134,15 +134,23 @@ class Resize_Audio(object) :
 
     return   {'audio' : (signal, sr), 'label' : sample['label']}
 
-class Build_MFCCS_librosa(object) :
+class Normalize_Signal(object) :
+      
+    def __call__(self,sample) :
+      signal,sr = sample['audio']
+      sc = StandardScaler()
+      signal = sc.fit_transform(signal)
+      return {'audio' : (signal,sr), 'label' : sample['label']}
 
+class Build_MFCCS_librosa(object) :
+    
   def __call__(self, sample) :
     signal, sr = sample['audio']
-    mfccs = librosa.feature.mfcc(y=signal, n_mfcc=10,sr=sr)
+    mfccs = librosa.feature.mfcc(y=signal, n_mfcc=13,sr=sr)
     #delta_mfccs = librosa.feature.delta(mfccs)
     #ddelta_mfccs = librosa.feature.delta(mfccs, order=2)
     #return {'mfccs' : mfccs, 'delta_mfccs' : delta_mfccs, 'ddelta_mfccs' : ddelta_mfccs}
-    return {'audio' : mfccs, 'label' : sample['label']}
+    return {'audio' : (mfccs,sr), 'label' : sample['label']}
 
 class Build_MFCCS_kaggle(object) :
     
@@ -155,19 +163,12 @@ class Build_MFCCS_kaggle(object) :
     #return {'mfccs' : mfccs, 'delta_mfccs' : delta_mfccs, 'ddelta_mfccs' : ddelta_mfccs}
     return {'audio' : mfccs, 'label' : sample['label']}
 
-class Normalize_Audio(object) :
-      
-    def __call__(self,sample) :
-      signal = sample['audio']
-      sc = StandardScaler()
-      signal = sc.fit_transform(signal)
-      return {'audio' : signal, 'label' : sample['label']}
-
 class To_Tensor(object):
 
     def __call__(self, sample):
-        signal, label = sample['audio'], sample['label']
-        signal = torch.unsqueeze(torch.from_numpy(signal),0)
-        if label is not None :
-          label = torch.from_numpy(label)
-        return {'audio': signal,'label': label}
+      signal = sample['audio']
+      label = sample['label']
+      signal = torch.unsqueeze(torch.from_numpy(signal),0)
+      if label is not None :
+        label = torch.from_numpy(label)
+      return {'audio': signal,'label': label}

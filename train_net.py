@@ -7,12 +7,11 @@ from network import MFCCS_net
 import torchvision.transforms as transforms
 import torch.nn as nn
 from tqdm import tqdm
-from data_transform import Resize_Audio, Build_MFCCS_librosa, Build_MFCCS_kaggle, To_Tensor, Normalize_Audio
-from data_set import SpokenLanguageIdentification
+from data_transform import Resize_Audio, Build_MFCCS_librosa, Build_MFCCS_kaggle, To_Tensor, Normalize_Signal
+from data_set import Data_FromAudioFile, Data_FromMFCCSFile
 from torch.utils.data import DataLoader
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 
 def train(net, optimizer, loader, writer, epochs, train_sample):
     criterion = nn.CrossEntropyLoss()
@@ -70,10 +69,11 @@ if __name__=='__main__':
 
     writer = SummaryWriter(f'runs/{args.exp_name}')
 
-    transform = transforms.Compose([Resize_Audio(),Build_MFCCS_librosa(),To_Tensor()])
     
-    trainset = SpokenLanguageIdentification('./data', train=True, transform=transform)
-    testset = SpokenLanguageIdentification('./data', train=False, transform=transform)
+    transform = transforms.Compose([To_Tensor()])
+    
+    trainset = Data_FromMFCCSFile('./data', train=True, transform=transform)
+    testset = Data_FromMFCCSFile('./data', train=False, transform=transform)
 
     trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=0)
     testloader = DataLoader(testset, batch_size=batch_size, shuffle=True, num_workers=0)
