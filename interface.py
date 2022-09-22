@@ -3,7 +3,7 @@ import librosa
 import numpy as np
 import sys
 from network import MFCCS_net 
-from data_transform import Resize_Audio, Build_MFCCS, To_Tensor, Normalize_Audio
+from data_transform import Resize_Audio, Build_MFCCS_librosa, To_Tensor, Normalize_Audio
 import torchvision.transforms as transforms
 import torch
 from torch.utils.data import DataLoader
@@ -38,7 +38,7 @@ if __name__=='__main__':
     net.load_state_dict(torch.load(weight_file,map_location=device))
     net.eval()
 
-    transform = transforms.Compose([Resize_Audio(),Build_MFCCS(),To_Tensor()])
+    transform = transforms.Compose([Resize_Audio(),Build_MFCCS_librosa(),To_Tensor()])
 
     app = gr.Interface(
     fn=predict, 
