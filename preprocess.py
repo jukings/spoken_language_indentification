@@ -3,19 +3,25 @@ import os
 import librosa
 import numpy as np
 import argparse
-
+from tqdm import tqdm
 DATA_DIR = './data'
+
 
 def build_mfccs(data_dir = DATA_DIR, train=True) :
 
     if train :
-        for file in os.listdir(f'{DATA_DIR}/train/train_audio/') :
+        t = tqdm(os.listdir(f'{DATA_DIR}/train/train_audio/'))
+        t.set_description('Building MFCCS from train set')
+        for file in t :
             signal, sr = librosa.load(f'{DATA_DIR}/train/train_audio/{file}')
             mfccs = librosa.feature.mfcc(y=signal, n_mfcc=10,sr=sr)
             new_file = file[:-4]
             np.save(f'{DATA_DIR}/train/train_mfccs/{new_file}mfccs',mfccs)
+
     if not train :
-        for file in os.listdir(f'{DATA_DIR}/test/test_audio/') :
+        t = tqdm(os.listdir(f'{DATA_DIR}/test/test_audio/'))
+        t.set_description('Building MFCCS from test set')
+        for file in t :
             signal, sr = librosa.load(f'{DATA_DIR}/test/test_audio/{file}')
             mfccs = librosa.feature.mfcc(y=signal, n_mfcc=10,sr=sr)
             new_file = file[:-4]
