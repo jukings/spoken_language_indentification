@@ -15,7 +15,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def predict(audio_file_path) :
     print(audio_file_path)
-    audio = librosa.load('/tmp/audiogov2f_0l.wav')
+    audio = librosa.load(audio_file_path)
     sample = {'audio' : audio, 'label' : np.zeros([0,0,0])}
     sample = transform(sample)
     input = sample['audio'].to(device, dtype=torch.float32)
