@@ -39,7 +39,7 @@ if __name__=='__main__':
     net.load_state_dict(torch.load(weight_file,map_location=device))
     net.eval()
 
-    transform = transforms.Compose([Resize_Audio(),Build_MFCCS(),Normalize_Audio(),To_Tensor()])
+    transform = transforms.Compose([Resize_Audio(),Build_MFCCS(),To_Tensor()])
 
     app = gr.Interface(
     fn=predict, 

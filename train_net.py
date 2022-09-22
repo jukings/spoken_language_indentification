@@ -14,13 +14,17 @@ from torch.utils.data import DataLoader
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def train(net, optimizer, loader, writer, epochs=10):
+def train(net, optimizer, loader, writer, epochs, train_sample):
     criterion = nn.CrossEntropyLoss()
     for epoch in range(epochs):
         running_loss = []
         t = tqdm(loader)
+        tmp_count = 0
         
         for data in t:
+            if tmp_count > train_sample :
+                break
+            tmp_count+=1
             inputs = data['audio'].to(device)
             labels = data['label'].to(device)
             outputs = net(inputs)
@@ -53,16 +57,18 @@ if __name__=='__main__':
     parser.add_argument('--batch_size', type=int, default = 64, help='batch size')
     parser.add_argument('--epochs', type=int, default = 10, help='epochs')
     parser.add_argument('--lr', type=float, default = 10**-3, help='learning rate')
+    parser.add_argument('--train_sample', type=float, default = 10**6, help='number of maximum sample for training')
 
     args = parser.parse_args()
     exp_name = args.exp_name
     epochs = args.epochs
     batch_size = args.batch_size
     lr = args.lr
+    train_sample = args.train_sample
 
     writer = SummaryWriter(f'runs/{args.exp_name}')
 
-    transform = transforms.Compose([Resize_Audio(),Build_MFCCS(),Normalize_Audio(),To_Tensor()])
+    transform = transforms.Compose([Resize_Audio(),Build_MFCCS(),To_Tensor()])
     
     trainset = SpokenLanguageIdentification('./data', train=True, transform=transform)
     testset = SpokenLanguageIdentification('./data', train=False, transform=transform)
@@ -74,7 +80,7 @@ if __name__=='__main__':
     net = net.to(device)
     optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
 
-    train(net, optimizer, trainloader, writer, epochs)
+    train(net, optimizer, trainloader, writer, epochs, train_sample)
     test_acc = test(net,testloader)
     print(f'Test accuracy : {test_acc}')
     torch.save(net.state_dict(), "mfccs_net.pth")
