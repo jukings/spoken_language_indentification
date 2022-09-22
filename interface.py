@@ -12,6 +12,7 @@ import librosa
 import argparse
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+DIC_VALUE_TO_LABEL = {0 : 'en', 1 : 'de', 2 : 'es'}
 
 def predict(audio_file_path) :
     print(audio_file_path)
