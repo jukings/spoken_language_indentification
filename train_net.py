@@ -10,10 +10,11 @@ from tqdm import tqdm
 from data_transform import Resize_Audio, Build_MFCCS_librosa, Build_MFCCS_kaggle, To_Tensor, Normalize_Signal
 from data_set import Data_FromAudioFile, Data_FromMFCCSFile
 from torch.utils.data import DataLoader
+from torch.optim.lr_scheduler import StepLR
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def train(net, optimizer, loader, writer, epochs, train_sample):
+def train(net, optimizer, loader, writer, epochs, scheduler=None):
     criterion = nn.CrossEntropyLoss()
 
     for epoch in range(epochs):
@@ -30,6 +31,9 @@ def train(net, optimizer, loader, writer, epochs, train_sample):
             loss.backward()
             optimizer.step()
             t.set_description(f'Epochs {epoch+1}/{epochs} -- training loss: {np.mean(running_loss)}')
+        
+        if scheduler is not None :
+            scheduler.step()
 
         writer.add_scalar('training loss', np.mean(running_loss), epoch)
 
@@ -54,7 +58,6 @@ if __name__=='__main__':
     parser.add_argument('--batch_size', type=int, default = 64, help='batch size')
     parser.add_argument('--epochs', type=int, default = 10, help='epochs')
     parser.add_argument('--lr', type=float, default = 10**-3, help='learning rate')
-    parser.add_argument('--train_sample', type=float, default = 10**6, help='number of maximum sample for training')
     parser.add_argument('--optimizer', type=str, default = 'SGD', help='optimizer to use for learning')
     parser.add_argument('--data_dir', type=str, default = './data', help='directory where to find the data')
 
@@ -63,7 +66,6 @@ if __name__=='__main__':
     epochs = args.epochs
     batch_size = args.batch_size
     lr = args.lr
-    train_sample = args.train_sample
     optimizer = args.optimizer
     data_dir = args.data_dir
 
@@ -88,11 +90,15 @@ if __name__=='__main__':
     else :
         raise TypeError("Not valid optimizer")
 
-    train(net, optimizer, trainloader, writer, epochs, train_sample)
+    scheduler = StepLR(optimizer, step_size= 1, gamma=0.9)
+
+    train(net, optimizer, trainloader, writer, epochs, scheduler)
     test_acc = test(net,testloader)
     print(f'Test accuracy : {test_acc}')
     torch.save(net.state_dict(), "mfccs_net.pth")
     
     image_example = torch.zeros(1,1,13,431)
     writer.add_graph(net, image_example)
+
+    
     
